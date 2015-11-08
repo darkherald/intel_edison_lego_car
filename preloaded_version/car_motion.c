@@ -1,0 +1,144 @@
+//
+//  car_motion.c
+//  
+//
+//  Created by mingrui shi on 11/7/15.
+//
+//
+
+#include "car_motion.h"
+#include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <signal.h>
+#include <string.h>
+#include <mraa/pwm.h>
+
+#define CENTER 0.0535f
+#define R 41.2
+#define V 14.8
+#define SPEED 50
+#define PI 3.1415926535
+#define MAXBUFSIZ 1024
+
+void speed_control(mraa_pwm_context in1, mraa_pwm_context in2, float speed) {
+    speed = speed/100;
+    if (speed >= 0) {
+        mraa_pwm_write(in2, 1.0f);
+        mraa_pwm_write(in1, 1.0f - speed);
+    }
+    else if (speed < 0) {
+        mraa_pwm_write(in1, 1.0f);
+        mraa_pwm_write(in2, 1.0f + speed);
+    }
+}
+
+typedef struct coordinate{
+    double x;
+    double y;
+} Coordinate;
+
+void caculateMotionTime(coordinate current, coordinate destination, double offset){
+    double dx = (destination.x - current.x); // x distance between destination and current
+    double dy = (destination.y - current.y); // y distance between destination and current
+    int turn = 0; // 0 means turn left 1 means turn right
+    double alpha = atan(dy/dx); // angle between current and destinatnion
+    if(dx < 0)
+        alpha += PI;
+    if(alpha > PI)
+        alpha -= 2*PI;
+    double beta = offset - alpha;
+    if(beta > PI)
+        beta -= 2*PI;
+    else if(beta < -PI)
+        beta += 2*PI;
+    // determine turn direction
+    if(beta > 0)
+        turn = 1;
+    double d_2 = dx * dx + dy * dy;
+    double l_2 = R * R + d_2 - 2 * R * sqrt(d_2)*sin(beta);
+    double straight = sqrt(l_2 - R*R);
+    double theta2 = acos((l_2 + R*R - d_2) /2/sqrt(l_2)/R);
+    double theta1 = acos(R / sqrt(l_2));
+    double turnangle;
+    //case 1
+    if(beta < PI/2)
+    {
+        turnangle = theta2 - theta1;
+    } else
+    {
+        turnangle = 2*PI - theta1 -theta2;
+    }
+    double round = turnangle*R;
+    
+    if(turn)
+    {
+        offset -= turnangle;
+    } else
+    {
+        offset += turnangle;
+    }
+    
+    if (offset > PI) {
+        offset -= 2*PI;
+    } else if(offset < -PI)
+        offset += 2*PI;
+    
+    double curveTime = round / V, straightTime = straight / V;
+    
+    //compensate for angle difference
+    float turnCtrl = CENTER;
+    if (turn)
+        turnCtrl += 0.015f;
+    else
+        turnCtrl -= 0.013f;
+    mraa_pwm_write(turn_pwm, turn);
+    usleep(100000);
+    
+    //go for the curve
+    speed_control(speed_pwm_in1, speed_pwm_in2, SPEED);
+    usleep(curveTime * 100000);
+    
+    //go straight
+    turnCtrl = CENTER;
+    mraa_pwm_write(turn_pwm, turn);
+    usleep(100000);
+    speed_control(speed_pwm_in1, speed_pwm_in2, SPEED);
+    usleep(straightTime * 100000);
+}
+
+
+int main(){
+    float speed, turn;
+    char speed_user_input[MAXBUFSIZ];
+    char turn_user_input[MAXBUFSIZ];
+    mraa_pwm_context speed_pwm_in1, speed_pwm_in2, turn_pwm;
+    speed_pwm_in1 = mraa_pwm_init(3);
+    speed_pwm_in2 = mraa_pwm_init(5);
+    turn_pwm = mraa_pwm_init(6);
+    
+    if (speed_pwm_in1 == NULL || speed_pwm_in2 == NULL || turn_pwm == NULL) {
+        fprintf(stderr, "Failed to initialized.\n");
+        return 1;
+    }
+    
+    mraa_pwm_period_us(speed_pwm_in1,870); //1150Hz
+    mraa_pwm_enable(speed_pwm_in1, 1);
+    mraa_pwm_period_us(speed_pwm_in2,870);
+    mraa_pwm_enable(speed_pwm_in2, 1);
+    
+    mraa_pwm_period_ms(turn_pwm,20);
+   	mraa_pwm_enable(turn_pwm, 1);
+    
+    mraa_pwm_write(turn_pwm, CENTER);
+    mraa_pwm_write(speed_pwm_in1, 1.0f);
+    mraa_pwm_write(speed_pwm_in2, 1.0f);
+    
+    Coordinate try1, try2;
+    try1.x = 0;
+    try1.y = 0;
+    try2.x = 50;
+    try2.y = 50;
+    caculateMotionTime(try1, try2, PI / 2);
+}
