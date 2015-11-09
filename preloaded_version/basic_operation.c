@@ -22,7 +22,7 @@
 #include <mraa/pwm.h>
 
 #define MAXBUFSIZ 1024
-#define CENTER 0.068f
+#define CENTER 0.0535f
 
 void speed_control(mraa_pwm_context, mraa_pwm_context, float);
 
@@ -30,6 +30,7 @@ int main(){
 	float speed, turn;
 	char speed_user_input[MAXBUFSIZ];
 	char turn_user_input[MAXBUFSIZ];
+	char time_user_input[MAXBUFSIZ];
 	mraa_pwm_context speed_pwm_in1, speed_pwm_in2, turn_pwm;
 	speed_pwm_in1 = mraa_pwm_init(3);
 	speed_pwm_in2 = mraa_pwm_init(5);
@@ -57,11 +58,11 @@ int main(){
         	scanf("%s", turn_user_input);               
                 
     		if (!strcmp(turn_user_input, "L") || !strcmp(turn_user_input, "l"))     
-           		turn = CENTER - 0.015f;                 
+           		turn = CENTER - 0.0145f;                 
         	else if (!strcmp(turn_user_input, "C") || !strcmp(turn_user_input, "c"))
             		turn = CENTER;                 
         	else if (!strcmp(turn_user_input, "R") || !strcmp(turn_user_input, "r"))
-            		turn = CENTER + 0.015f;
+            		turn = CENTER + 0.017f;
 		else {                                 
             		printf("Wrong turn type!\n");
  			return 1;
@@ -71,6 +72,10 @@ int main(){
 		scanf("%s", speed_user_input);
 		speed = atof(speed_user_input);
 
+		printf("time: ");
+		scanf("%s", time_user_input);
+		int time = atoi(time_user_input);
+
 		if (speed > 100 || speed < -100)
 			printf("Error: Choose between -100 and 100\n");
 		else {
@@ -78,7 +83,7 @@ int main(){
 			usleep(100000);
 			speed_control(speed_pwm_in1, speed_pwm_in2, speed);
 		}
-		sleep(1);
+		sleep(time);
 		speed_control(speed_pwm_in1, speed_pwm_in2, 0.0f);
 	}
 	return 0;
