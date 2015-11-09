@@ -153,9 +153,9 @@ int main(){
     Coordinate try1, try2, try3, try4;
     try1.x = 0;
     try1.y = 0;
-    try2.x = -60;
+    try2.x = 60;
     try2.y = 60;
-    try3.x = -120;
+    try3.x = 140;
     try3.y = 100;
     try4.x = 0;
     try4.y = 0;
