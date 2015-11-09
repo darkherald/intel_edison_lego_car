@@ -13,7 +13,10 @@
 #include <unistd.h>
 #include <signal.h>
 #include <string.h>
+#include "IR_device.h"
 #include <mraa/pwm.h>
+#include <string>
+#include <iostream>
 
 #define CENTER 0.0535f
 #define Rr 34 // right R
@@ -23,6 +26,8 @@
 #define SPEED 50
 #define PI 3.1415926535
 #define MAXBUFSIZ 1024
+
+using namespace std;
 
 mraa_pwm_context speed_pwm_in1, speed_pwm_in2, turn_pwm;
 
@@ -43,7 +48,7 @@ typedef struct coordinate{
     double y;
 } Coordinate;
 
-double caculateMotionTime(Coordinate current, Coordinate destination, double offset){
+double caculateMotionTime(Coordinate current, Coordinate destination, double offset, IR_device* ir){
     double dx = (destination.x - current.x); // x distance between destination and current
     double dy = (destination.y - current.y); // y distance between destination and current
     int turn = 0; // 0 means turn left 1 means turn right
@@ -117,8 +122,8 @@ double caculateMotionTime(Coordinate current, Coordinate destination, double off
     speed_control(speed_pwm_in1, speed_pwm_in2, SPEED);
     usleep(straightTime * 1000000);
     speed_control(speed_pwm_in1, speed_pwm_in2, 0.0f);
-    sleep(5);
-
+    string msg = ir->recv();
+    cout << msg << endl;
     return offset;
 }
 
@@ -149,6 +154,9 @@ int main(){
     mraa_pwm_write(speed_pwm_in2, 1.0f);
     
     char ch = getchar();
+    
+    IR_device *ir = new IR_device(8, "recv");
+    
 
     Coordinate try1, try2, try3, try4;
     try1.x = 0;
@@ -159,7 +167,8 @@ int main(){
     try3.y = 100;
     try4.x = 0;
     try4.y = 0;
-    double newOffset = caculateMotionTime(try1, try2, PI / 2);
-    newOffset =  caculateMotionTime(try2, try3, newOffset);
-    caculateMotionTime(try3, try4, newOffset);
+    double newOffset = caculateMotionTime(try1, try2, PI / 2, ir);
+    newOffset =  caculateMotionTime(try2, try3, newOffset, ir);
+    caculateMotionTime(try3, try4, newOffset, ir);
+    delete ir;
 }
