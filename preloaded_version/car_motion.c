@@ -16,10 +16,10 @@
 #include <mraa/pwm.h>
 
 #define CENTER 0.0535f
-#define Rr 34
-#define Rl 30
-#define V 14
-#define Vr 12.10
+#define Rr 34 // right R
+#define Rl 30 // left R
+#define V 14 // straight speed
+#define Vr 12.10 // turning speed
 #define SPEED 50
 #define PI 3.1415926535
 #define MAXBUFSIZ 1024
@@ -73,17 +73,17 @@ double caculateMotionTime(Coordinate current, Coordinate destination, double off
     if(beta < PI/2)
     {
         turnangle = theta2 - theta1;
-    } else
-    {
+    //case 2
+    } else {
         turnangle = 2*PI - theta1 -theta2;
     }
     double round = turnangle*R;
     
+    // caculate new offset
     if(turn)
     {
         offset -= turnangle;
-    } else
-    {
+    } else {
         offset += turnangle;
     }
     
