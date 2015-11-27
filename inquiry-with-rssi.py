@@ -128,7 +128,6 @@ try:
 except:
     print "error accessing bluetooth device..."
     sys.exit(1)
-
 try:
     mode = read_inquiry_mode(sock)
 except Exception, e:
@@ -150,4 +149,5 @@ if mode != 1:
         print "error while setting inquiry mode"
     print "result: %d" % result
 
-device_inquiry_with_with_rssi(sock)
+while True:
+    device_inquiry_with_with_rssi(sock)
