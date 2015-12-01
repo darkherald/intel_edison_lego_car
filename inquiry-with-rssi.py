@@ -123,33 +123,35 @@ def device_inquiry_with_with_rssi(sock):
 
     return results
 
-dev_id = 0
-try:
-    sock = bluez.hci_open_dev(dev_id)
-except:
-    print "error accessing bluetooth device..."
-    sys.exit(1)
-try:
-    mode = read_inquiry_mode(sock)
-except Exception, e:
-    print "error reading inquiry mode.  "
-    print "Are you sure this a bluetooth 1.2 device?"
-    print e
-    sys.exit(1)
-print "current inquiry mode is %d" % mode
-
-if mode != 1:
-    print "writing inquiry mode..."
+def inquiry_with_rssi():
+    dev_id = 0
     try:
-        result = write_inquiry_mode(sock, 1)
+        sock = bluez.hci_open_dev(dev_id)
+    except:
+        print "error accessing bluetooth device..."
+        sys.exit(1)
+    try:
+        mode = read_inquiry_mode(sock)
     except Exception, e:
-        print "error writing inquiry mode.  Are you sure you're root?"
+        print "error reading inquiry mode.  "
+        print "Are you sure this a bluetooth 1.2 device?"
         print e
         sys.exit(1)
-    if result != 0:
-        print "error while setting inquiry mode"
-    print "result: %d" % result
+    print "current inquiry mode is %d" % mode
 
-while True:
-    time.sleep(1)
-    device_inquiry_with_with_rssi(sock)
+    if mode != 1:
+        print "writing inquiry mode..."
+        try:
+            result = write_inquiry_mode(sock, 1)
+        except Exception, e:
+            print "error writing inquiry mode.  Are you sure you're root?"
+            print e
+            sys.exit(1)
+        if result != 0:
+            print "error while setting inquiry mode"
+        print "result: %d" % result
+
+    while True:
+        time.sleep(1)
+        device_inquiry_with_with_rssi(sock)
+inquiry_with_rssi
