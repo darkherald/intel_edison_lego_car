@@ -39,6 +39,9 @@ using namespace std;
 
 mraa_pwm_context speed_pwm_in1, speed_pwm_in2, turn_pwm;
 int counter = 0;
+
+bool running = false;
+
 void speed_control(mraa_pwm_context in1, mraa_pwm_context in2, float speed) {
     speed = speed/100;
     if (speed >= 0) {
@@ -176,6 +179,13 @@ double caculateMotionTime(Coordinate current, Coordinate destination, double off
     return offset;
 }
 
+void car_report(CarSys *car) {
+  while (running) {
+    sleep(5);
+    thread t = car->threading();
+    t.join();
+  }
+}
 
 int main(){
     float speed, turn;
@@ -208,6 +218,7 @@ int main(){
     IR_device *ir = new IR_device(12, "recv");
     
 
+/*
     Coordinate try1, try2, try3, try4, try5;
     try1.x = 0;
     try1.y = 0;
@@ -219,9 +230,19 @@ int main(){
     try4.y = -60;
     try5.x = 0;
     try5.y = 0;
-    double newOffset = caculateMotionTime(try1, try2, PI / 2, ir);
-    newOffset =  caculateMotionTime(try2, try3, newOffset, ir);
-    newOffset = caculateMotionTime(try3, try4, newOffset, ir);
-    newOffset = caculateMotionTime(try4, try5, newOffset, ir);
+*/
+    CarSys *car = new CarSys(5, 5);
+    thread t1 = car->threading();
+    t1.join();
+    running = true;
+    thread t2(car_report, car);
+    vector<Coordinate> path = car->getPath();
+    double newOffset = PI / 2;
+    int n = path.size();
+    for (int cur = 1; cur < n; ++cur)
+      newOffset =  caculateMotionTime(path[cur - 1], path[cur], newOffset, ir);
+
+    running = false;
     delete ir;
+    t2.join();
 }
