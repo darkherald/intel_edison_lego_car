@@ -168,6 +168,7 @@ double caculateMotionTime(Coordinate current, Coordinate destination, double off
     usleep(100000);
     speed_control(speed_pwm_in1, speed_pwm_in2, SPEED);
     usleep(straightTime * 1000000);
+*/
     speed_control(speed_pwm_in1, speed_pwm_in2, 0.0f);
 
     // receive message
