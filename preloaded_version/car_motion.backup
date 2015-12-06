@@ -23,13 +23,7 @@
 #define Rr 34 // right R
 #define Rl 30 // left R
 #define V 14 // straight speed
-#define Vr 12.40 // turning speed
-
-#define C_w 13.8 // rear wheel circumference
-#define A 1 // pid control coefficient
-#define D_TH 15 // threshold distance
-#define MIN_SPEED 15 // minimum speed
-
+#define Vr 12.10 // turning speed
 #define SPEED 50
 #define PI 3.1415926535
 #define MAXBUFSIZ 1024
@@ -37,7 +31,7 @@
 using namespace std;
 
 mraa_pwm_context speed_pwm_in1, speed_pwm_in2, turn_pwm;
-int counter = 0;
+
 void speed_control(mraa_pwm_context in1, mraa_pwm_context in2, float speed) {
     speed = speed/100;
     if (speed >= 0) {
@@ -55,16 +49,9 @@ typedef struct coordinate{
     double y;
 } Coordinate;
 
-double getSpeed(double dist) {
-    if (dist < D_TH)
-      return MIN_SPEED;
-    return A * dist;
-}
-
 double caculateMotionTime(Coordinate current, Coordinate destination, double offset, IR_device* ir){
     double dx = (destination.x - current.x); // x distance between destination and current
     double dy = (destination.y - current.y); // y distance between destination and current
-    cout<<"Destination Coordinate ("<<destination.x<<", "<<destination.y<<")"<<endl;
     int turn = 0; // 0 means turn left 1 means turn right
     double alpha = atan(dy/dx); // angle between current and destinatnion
     if(dx < 0)
@@ -122,52 +109,20 @@ double caculateMotionTime(Coordinate current, Coordinate destination, double off
     mraa_pwm_write(turn_pwm, turnCtrl);
     usleep(100000);
     
-    cout<< "curveTime, straightTime, angleOffset"<<endl;
+
     printf("%.4f, %.4f", curveTime, straightTime);
     printf(" %.4f\n", offset);    
-
-    RearWheel rw;
-
     //go for the curve
-    thread t1(&RearWheel::update, &rw);
-    t1.join();
-
-    double traveled = 0;
-    while (round > traveled) {
-      double left = round - traveled;
-      speed_control(speed_pwm_in1, speed_pwm_in2, getSpeed(left));
-      usleep(1000000);
-      traveled = rw.getCount() * C_w;
-    }
-
-    //go straight
-    rw.clear();
-    turnCtrl = CENTER;
-    mraa_pwm_write(turn_pwm, turnCtrl);
-
-    thread t2(&RearWheel::update, &rw);
-    t2.join();
-
-    traveled = 0;
-    while (straight > traveled) {
-      double left = straight - traveled;
-      speed_control(speed_pwm_in1, speed_pwm_in2, getSpeed(left));
-      usleep(1000000);
-      traveled = rw.getCount() * C_w;
-    }
-
-    //speed_control(speed_pwm_in1, speed_pwm_in2, SPEED);
-    //usleep(curveTime * 1000000);
+    speed_control(speed_pwm_in1, speed_pwm_in2, SPEED);
+    usleep(curveTime * 1000000);
     
-    /*
+    //go straight
     turnCtrl = CENTER;
     mraa_pwm_write(turn_pwm, turnCtrl);
     usleep(100000);
     speed_control(speed_pwm_in1, speed_pwm_in2, SPEED);
     usleep(straightTime * 1000000);
     speed_control(speed_pwm_in1, speed_pwm_in2, 0.0f);
-
-    // receive message
     string msg = ir->recv();
     cout << msg << endl;
     return offset;
@@ -198,27 +153,23 @@ int main(){
     mraa_pwm_write(turn_pwm, CENTER);
     mraa_pwm_write(speed_pwm_in1, 1.0f);
     mraa_pwm_write(speed_pwm_in2, 1.0f);
-    cout<< "Initialization Complete"<<endl;
-    cout<< "Press Enter to continue."; 
+    
     char ch = getchar();
     
-    IR_device *ir = new IR_device(12, "recv");
+    IR_device *ir = new IR_device(8, "recv");
     
 
-    Coordinate try1, try2, try3, try4, try5;
+    Coordinate try1, try2, try3, try4;
     try1.x = 0;
     try1.y = 0;
-    try2.x = 60;
+    try2.x = -60;
     try2.y = 60;
-    try3.x = 140;
-    try3.y = 0;
-    try4.x = 60;
-    try4.y = -60;
-    try5.x = 0;
-    try5.y = 0;
+    try3.x = -120;
+    try3.y = 100;
+    try4.x = 0;
+    try4.y = 0;
     double newOffset = caculateMotionTime(try1, try2, PI / 2, ir);
     newOffset =  caculateMotionTime(try2, try3, newOffset, ir);
-    newOffset = caculateMotionTime(try3, try4, newOffset, ir);
-    newOffset = caculateMotionTime(try4, try5, newOffset, ir);
+    caculateMotionTime(try3, try4, newOffset, ir);
     delete ir;
 }
