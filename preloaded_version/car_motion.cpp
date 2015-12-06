@@ -41,6 +41,7 @@ mraa_pwm_context speed_pwm_in1, speed_pwm_in2, turn_pwm;
 int counter = 0;
 
 bool running = false;
+CarSys *car;
 
 void speed_control(mraa_pwm_context in1, mraa_pwm_context in2, float speed) {
     speed = speed/100;
@@ -231,7 +232,7 @@ int main(){
     try5.x = 0;
     try5.y = 0;
 */
-    CarSys *car = new CarSys(5, 5);
+    car = new CarSys(5, 5);
     thread t1 = car->threading();
     t1.join();
     running = true;
@@ -245,4 +246,5 @@ int main(){
     running = false;
     delete ir;
     t2.join();
+    delete car;
 }

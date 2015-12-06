@@ -10,6 +10,8 @@
 #include <stdlib.h>
 #include <utility>
 #include <thread>
+#include <algorithm>
+#include <climits>
 using namespace std;
 
 class Coordinate {
