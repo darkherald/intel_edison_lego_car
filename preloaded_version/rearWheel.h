@@ -27,8 +27,8 @@ public:
 		this->isRun = true;
 		this->m.unlock();
 		mraa_gpio_context outA, outB;
-		outA = mraa_gpio_init(2);
-		outB = mraa_gpio_init(3);
+		outA = mraa_gpio_init(1);
+		outB = mraa_gpio_init(2);
 		mraa_gpio_dir(outA, MRAA_GPIO_IN);
 		mraa_gpio_dir(outB, MRAA_GPIO_IN);
 		int a = 0, b = 0;
