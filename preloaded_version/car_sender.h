@@ -27,7 +27,7 @@ public:
   }
 };
 
-string hostname = "localhost", port = "1222";
+string hostname = "172.20.10.4", port = "1222";
 
 void createAdjMat(const vector<Coordinate> &points, vector<vector<double> > &adjMat) {
     int n = points.size();
@@ -168,6 +168,11 @@ public:
     for (int i : path)
       result.push_back(points[i]);
     return result;
+  }
+
+  void setCarPos(double x, double y) {
+    carPos.x = x;
+    carPos.y = y;
   }
 
   thread threading() {
