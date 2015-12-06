@@ -125,35 +125,38 @@ double caculateMotionTime(Coordinate current, Coordinate destination, double off
     printf("%.4f, %.4f", curveTime, straightTime);
     printf(" %.4f\n", offset);    
 
-    RearWheel rw;
+    RearWheel *rw = new RearWheel();
 
     //go for the curve
-    thread t1(&RearWheel::update, &rw);
-    t1.join();
+    thread t1 = rw->threading();
 
     double traveled = 0;
     while (round > traveled) {
       double left = round - traveled;
       speed_control(speed_pwm_in1, speed_pwm_in2, getSpeed(left));
       usleep(1000000);
-      traveled = rw.getCount() * C_w;
+      traveled = rw->getCount() * C_w;
     }
 
+    rw->clear();
+    t1.join();
+
     //go straight
-    rw.clear();
     turnCtrl = CENTER;
     mraa_pwm_write(turn_pwm, turnCtrl);
 
-    thread t2(&RearWheel::update, &rw);
-    t2.join();
+    thread t2 = rw->threading();
 
     traveled = 0;
     while (straight > traveled) {
       double left = straight - traveled;
       speed_control(speed_pwm_in1, speed_pwm_in2, getSpeed(left));
       usleep(1000000);
-      traveled = rw.getCount() * C_w;
+      traveled = rw->getCount() * C_w;
     }
+
+    rw->clear();
+    t2.join();
 
     //speed_control(speed_pwm_in1, speed_pwm_in2, SPEED);
     //usleep(curveTime * 1000000);

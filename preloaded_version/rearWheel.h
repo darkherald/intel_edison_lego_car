@@ -25,7 +25,6 @@ public:
 		this->m.lock();
 		this->isRun = true;
 		this->m.unlock();
-/*
 		mraa_gpio_context outA, outB;
 		outA = mraa_gpio_init(2);
 		outB = mraa_gpio_init(3);
@@ -34,9 +33,7 @@ public:
 		int a = 0, b = 0;
 		while (!a)
 			a = mraa_gpio_read(outA);
-*/
 		while (this->isRunning()) {
-/*
 			while (a) {
 				a = mraa_gpio_read(outA);
 				b = mraa_gpio_read(outB);
@@ -47,7 +44,6 @@ public:
 				b = mraa_gpio_read(outB);
 			}
 			increment();
-*/
 			usleep(10);
 		}
 		std::cout << "End updating.\n";
