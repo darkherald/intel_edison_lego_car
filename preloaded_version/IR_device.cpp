@@ -70,7 +70,7 @@ void sig_handler_recv(int signum){
                     if(temp == recv_byte){
                         recv_array[index] = recv_byte;
                         bytes_recved++;
-                        // cout << "byte received\n";
+                        cout << "byte received\n";
                     }
                     header_received = false;
                     addr_received = false;
@@ -79,6 +79,7 @@ void sig_handler_recv(int signum){
                     // cout << "byte recved = " << temp << endl;
                     if(bytes_recved >= msg_leng){
                         msg_recvd = true;    
+                        signal(SIGALRM, SIG_DFL);  
                     }
                 }
 
@@ -100,7 +101,7 @@ void sig_handler_recv(int signum){
                     bit_counter = 0;
                     if(temp == index)
                     {
-                        // cout << "addr received\n";
+                         cout << "addr received\n";
                         addr_received = true;
                         if(!len_get){
                             if(index <= last_index){
@@ -136,7 +137,7 @@ void sig_handler_recv(int signum){
                     header_zero_received = false;
                 }
                 if(header_counter_one == 10){
-                    // cout << "Header detected\n";
+                     cout << "Header detected\n";
                     header_received = true;
                 }
             }
@@ -320,7 +321,6 @@ string IR_device::recv(){
     }
 
     while(!msg_recvd){};
-    signal(SIGALRM, SIG_DFL);  
     string str="";
     for(int i=0;i<msg_leng;i++)
         str += recv_array[i];
