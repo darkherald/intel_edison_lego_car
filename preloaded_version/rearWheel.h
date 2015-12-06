@@ -1,6 +1,7 @@
 #include <mutex>
 #include <thread>
 #include <unistd.h>
+#include <mraa/gpio.h>
 
 class RearWheel {
 public:
