@@ -18,7 +18,6 @@
 #include <string>
 #include <iostream>
 #include "rearWheel.h"
-#include "car_sender.h"
 
 #define CENTER 0.0565f
 #define Rr 34 // right R
@@ -50,6 +49,11 @@ void speed_control(mraa_pwm_context in1, mraa_pwm_context in2, float speed) {
         mraa_pwm_write(in2, 1.0f + speed);
     }
 }
+
+typedef struct coordinate{
+    double x;
+    double y;
+} Coordinate;
 
 double getSpeed(double dist) {
     if (dist < D_TH)
