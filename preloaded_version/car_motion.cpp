@@ -22,7 +22,7 @@
 #define Rr 34 // right R
 #define Rl 30 // left R
 #define V 14 // straight speed
-#define Vr 12.10 // turning speed
+#define Vr 12.40 // turning speed
 #define SPEED 50
 #define PI 3.1415926535
 #define MAXBUFSIZ 1024
@@ -30,7 +30,7 @@
 using namespace std;
 
 mraa_pwm_context speed_pwm_in1, speed_pwm_in2, turn_pwm;
-
+int counter = 0;
 void speed_control(mraa_pwm_context in1, mraa_pwm_context in2, float speed) {
     speed = speed/100;
     if (speed >= 0) {
@@ -51,6 +51,7 @@ typedef struct coordinate{
 double caculateMotionTime(Coordinate current, Coordinate destination, double offset, IR_device* ir){
     double dx = (destination.x - current.x); // x distance between destination and current
     double dy = (destination.y - current.y); // y distance between destination and current
+    cout<<"Destination Coordinate ("<<destination.x<<", "<<destination.y<<")"<<endl;
     int turn = 0; // 0 means turn left 1 means turn right
     double alpha = atan(dy/dx); // angle between current and destinatnion
     if(dx < 0)
@@ -108,9 +109,9 @@ double caculateMotionTime(Coordinate current, Coordinate destination, double off
     mraa_pwm_write(turn_pwm, turnCtrl);
     usleep(100000);
     
-
+    cout<< "curveTime, straightTime, angleOffset"<<endl;
     printf("%.4f, %.4f", curveTime, straightTime);
-    printf(" %.4f\n" , offset);    
+    printf(", %.4f\n" , offset);    
     //go for the curve
     speed_control(speed_pwm_in1, speed_pwm_in2, SPEED);
     usleep(curveTime * 1000000);
@@ -122,8 +123,13 @@ double caculateMotionTime(Coordinate current, Coordinate destination, double off
     speed_control(speed_pwm_in1, speed_pwm_in2, SPEED);
     usleep(straightTime * 1000000);
     speed_control(speed_pwm_in1, speed_pwm_in2, 0.0f);
-    string msg = ir->recv();
-    cout << msg << endl;
+    //string msg = ir->recv();
+    sleep(10);
+    //cout << msg << endl;
+    if(counter != 3)
+    cout<<"LED ID"<<counter<<endl;
+    counter++;
+    sleep(1);
     return offset;
 }
 
@@ -152,23 +158,27 @@ int main(){
     mraa_pwm_write(turn_pwm, CENTER);
     mraa_pwm_write(speed_pwm_in1, 1.0f);
     mraa_pwm_write(speed_pwm_in2, 1.0f);
-    
+    cout<< "Initialization Complete"<<endl;
+    cout<< "Press Enter to continue."; 
     char ch = getchar();
     
-    IR_device *ir = new IR_device(8, "recv");
+    IR_device *ir = new IR_device(12, "recv");
     
 
-    Coordinate try1, try2, try3, try4;
+    Coordinate try1, try2, try3, try4, try5;
     try1.x = 0;
     try1.y = 0;
     try2.x = 60;
     try2.y = 60;
     try3.x = 140;
-    try3.y = 100;
-    try4.x = 0;
-    try4.y = 0;
+    try3.y = 0;
+    try4.x = 60;
+    try4.y = -60;
+    try5.x = 0;
+    try5.y = 0;
     double newOffset = caculateMotionTime(try1, try2, PI / 2, ir);
     newOffset =  caculateMotionTime(try2, try3, newOffset, ir);
-    caculateMotionTime(try3, try4, newOffset, ir);
+    newOffset = caculateMotionTime(try3, try4, newOffset, ir);
+    newOffset = caculateMotionTime(try4, try5, newOffset, ir);
     delete ir;
 }

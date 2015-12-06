@@ -6,7 +6,7 @@
 
 using namespace std;
 
-#define INTERVAL 10/* finest time interval in milliseconds*/
+#define INTERVAL 80/* finest time interval in milliseconds*/
 #define Packet_size 44 //Header:10 Addr:16 Data:16 End:2
 
 class IR_device

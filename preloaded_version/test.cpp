@@ -8,7 +8,7 @@ using namespace std;
 int main(int argc, char const *argv[])
 {
     cout << "Operating at " << INTERVAL << "ms intervals...\n";
-    IR_device tmp = IR_device(3, "recv");
+    IR_device tmp = IR_device(12, "recv");
     string msg = tmp.recv();
     cout << msg << endl;
     // msg = tmp.recv();
