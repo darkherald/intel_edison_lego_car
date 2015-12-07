@@ -259,7 +259,7 @@ int main(){
     try5.x = 0;
     try5.y = 0;
 */
-    car = new CarSys(5, 5);
+    car = new CarSys(140, 0);
     thread t1 = car->threading();
     t1.join();
     running = true;
