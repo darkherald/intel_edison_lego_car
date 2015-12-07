@@ -21,15 +21,15 @@
 #include "car_sender.h"
 
 #define CENTER 0.0565f
-#define Rr 34 // right R
-#define Rl 30 // left R
+#define Rr 31.2 // right R
+#define Rl 32.7 // left R
 #define V 14 // straight speed
 #define Vr 12.40 // turning speed
 
 #define C_w 13.8 // rear wheel circumference
-#define A 1.5 // pid control coefficient
+#define A 1.8 // pid control coefficient
 #define D_TH 20 // threshold distance
-#define MIN_SPEED 30 // minimum speed
+#define MIN_SPEED 36 // minimum speed
 
 #define SPEED 50
 #define PI 3.1415926535
@@ -117,9 +117,9 @@ double caculateMotionTime(Coordinate current, Coordinate destination, double off
     //compensate for angle difference
     float turnCtrl = CENTER;
     if (turn)
-        turnCtrl += 0.015f;
+        turnCtrl += 0.018f;
     else
-        turnCtrl -= 0.0145f;
+        turnCtrl -= 0.015f;
     mraa_pwm_write(turn_pwm, turnCtrl);
     usleep(100000);
     
@@ -137,7 +137,7 @@ double caculateMotionTime(Coordinate current, Coordinate destination, double off
       double left = round - traveled;
       cout<< "Distance left " << left <<endl;
       speed_control(speed_pwm_in1, speed_pwm_in2, getSpeed(left));
-      usleep(1000000);
+      usleep(500000);
       traveled = rw->getCount() * C_w / 360;
       cout<< "Traveled " << traveled << endl;
     }
@@ -158,7 +158,7 @@ double caculateMotionTime(Coordinate current, Coordinate destination, double off
       double left = straight - traveled;
       cout<< "Distance left " << left <<endl;
       speed_control(speed_pwm_in1, speed_pwm_in2, getSpeed(left));
-      usleep(1000000);
+      usleep(500000);
       traveled = rw->getCount() * C_w / 360;
       cout<< "Traveled " << traveled << endl;
     }
@@ -178,10 +178,11 @@ double caculateMotionTime(Coordinate current, Coordinate destination, double off
     speed_control(speed_pwm_in1, speed_pwm_in2, SPEED);
     usleep(straightTime * 1000000);
 */
-
+    cout<<"Sleep for 5 seconds"<<endl;
+    sleep(5); 
     // receive message
-    string msg = ir->recv();
-    cout << msg << endl;
+    // string msg = ir->recv();
+    //cout << msg << endl;
     return offset;
 }
 

@@ -22,7 +22,7 @@
 #include <mraa/pwm.h>
 
 #define MAXBUFSIZ 1024
-#define CENTER 0.0535f
+#define CENTER 0.055f
 
 void speed_control(mraa_pwm_context, mraa_pwm_context, float);
 
@@ -58,11 +58,11 @@ int main(){
         	scanf("%s", turn_user_input);               
                 
     		if (!strcmp(turn_user_input, "L") || !strcmp(turn_user_input, "l"))     
-           		turn = CENTER - 0.0145f;                 
+           		turn = CENTER - 0.015f;                 
         	else if (!strcmp(turn_user_input, "C") || !strcmp(turn_user_input, "c"))
             		turn = CENTER;                 
         	else if (!strcmp(turn_user_input, "R") || !strcmp(turn_user_input, "r"))
-            		turn = CENTER + 0.017f;
+            		turn = CENTER + 0.018f;
 		else {                                 
             		printf("Wrong turn type!\n");
  			return 1;

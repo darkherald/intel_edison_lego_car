@@ -12,7 +12,8 @@ public:
 
 	void clear() {
 		std::lock_guard<std::mutex> g(this->m);
-		this->isRun = false;
+		std::cout<<"Clear called !!!!!!"<<std::endl;
+                this->isRun = false;
 		this->count = 0;
 	}
 
@@ -38,11 +39,17 @@ public:
 			while (a) {
 				a = mraa_gpio_read(outA);
 				b = mraa_gpio_read(outB);
-			}
+			        if(!isRunning()){
+                                    break;
+                                }
+                        }
 			increment();
 			while (!a) {
 				a = mraa_gpio_read(outA);
 				b = mraa_gpio_read(outB);
+                                if(!isRunning()){
+                                    break;
+                                }
 			}
 			increment();
 			usleep(10);
