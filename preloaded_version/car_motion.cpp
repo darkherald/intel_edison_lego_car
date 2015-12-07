@@ -143,7 +143,7 @@ double caculateMotionTime(Coordinate current, Coordinate destination, double off
       traveled = rw->getCount() * C_w / 360;
       cout<< "Traveled " << traveled << endl;
     }
-
+    cout<<"Round Finished !!!!!!"<<endl;
     speed_control(speed_pwm_in1, speed_pwm_in2, 0.0f);
     usleep(100000);
     rw->clear();
@@ -164,7 +164,7 @@ double caculateMotionTime(Coordinate current, Coordinate destination, double off
       traveled = rw->getCount() * C_w / 360;
       cout<< "Traveled " << traveled << endl;
     }
-
+    cout<<"Straight part finished !!!!"<<endl;
     speed_control(speed_pwm_in1, speed_pwm_in2, 0.0f);
     usleep(100000);
     rw->clear();
