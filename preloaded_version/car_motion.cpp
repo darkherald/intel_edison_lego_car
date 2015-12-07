@@ -27,9 +27,9 @@
 #define Vr 12.40 // turning speed
 
 #define C_w 13.8 // rear wheel circumference
-#define A 1 // pid control coefficient
-#define D_TH 15 // threshold distance
-#define MIN_SPEED 15 // minimum speed
+#define A 1.5 // pid control coefficient
+#define D_TH 20 // threshold distance
+#define MIN_SPEED 30 // minimum speed
 
 #define SPEED 50
 #define PI 3.1415926535
@@ -58,7 +58,8 @@ void speed_control(mraa_pwm_context in1, mraa_pwm_context in2, float speed) {
 double getSpeed(double dist) {
     if (dist < D_TH)
       return MIN_SPEED;
-    return A * dist;
+    int s = A * dist;
+    return s > 100 ? 100 : s;
 }
 
 double caculateMotionTime(Coordinate current, Coordinate destination, double offset, IR_device* ir){
