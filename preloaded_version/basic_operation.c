@@ -20,6 +20,8 @@
 #include <signal.h>
 #include <string.h>
 #include <mraa/pwm.h>
+#include "rearWheel.h"
+
 
 #define MAXBUFSIZ 1024
 #define CENTER 0.055f
@@ -52,9 +54,15 @@ int main(){
 	mraa_pwm_write(turn_pwm, CENTER);
 	mraa_pwm_write(speed_pwm_in1, 1.0f);
 	mraa_pwm_write(speed_pwm_in2, 1.0f);
-
+    
+    RearWheel *rw = new RearWheel();
+    
+    //go for the curve
+    thread t1;
+    
 	while(1){
-	        printf("Turn (L, C, R): ");                                      
+            t1 = rw->threading();
+	        printf("Turn (L, C, R): ");
         	scanf("%s", turn_user_input);               
                 
     		if (!strcmp(turn_user_input, "L") || !strcmp(turn_user_input, "l"))     
@@ -85,6 +93,10 @@ int main(){
 		}
 		sleep(time);
 		speed_control(speed_pwm_in1, speed_pwm_in2, 0.0f);
+        float count = rw->getCount();
+        printf("%.2f \n", count);
+        rw->clear();
+        t1.join();
 	}
 	return 0;
 }
