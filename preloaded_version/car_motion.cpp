@@ -148,10 +148,12 @@ double caculateMotionTime(Coordinate current, Coordinate destination, double off
       cout<< "Traveled " << traveled << endl;
       double delta_gamma = traveled / R;
       double gamma_prime = gamma-delta_gamma*flag;
-      double x_send = x_c + R * sin(gamma_prime);
-      double y_send = y_c + R * cos(gamma_prime);
+      double x_send = x_c + R * cos(gamma_prime);
+      double y_send = y_c + R * sin(gamma_prime);
       car->setCarPos(x_send, y_send);
+      cout<<"Coordinate Sended"<<x_send<<" "<< y_send<<endl;
       thread t_send_round = car->threading();
+      t_send_round.join();
     }
     cout<<"Round Finished !!!!!!"<<endl;
     speed_control(speed_pwm_in1, speed_pwm_in2, 0.0f);
@@ -173,10 +175,13 @@ double caculateMotionTime(Coordinate current, Coordinate destination, double off
       usleep(500000);
       traveled = rw->getCount() * C_w / 360;
       cout<< "Traveled " << traveled << endl;
-      double x_send = destination.x - left * cos(PI-offset);
-      double y_send = destination.y + left * sin(offset);
-        car->setCarPos(x_send, y_send);
-        threading t_send_straight = car->threading;
+      double x_send = destination.x - left * cos(offset);
+      double y_send = destination.y - left * sin(offset);
+      car->setCarPos(x_send, y_send);
+      cout<<"Coordinate Sended"<<x_send<<" "<< y_send<<endl;
+      thread t_send_straight = car->threading();
+      t_send_straight.join();
+
     }
     cout<<"Straight part finished !!!!"<<endl;
     speed_control(speed_pwm_in1, speed_pwm_in2, 0.0f);
@@ -197,8 +202,8 @@ double caculateMotionTime(Coordinate current, Coordinate destination, double off
     cout<<"Sleep for 5 seconds"<<endl;
     sleep(5); 
     // receive message
-    // string msg = ir->recv();
-    //cout << msg << endl;
+    string msg = ir->recv();
+    cout << msg << endl;
     return offset;
 }
 
