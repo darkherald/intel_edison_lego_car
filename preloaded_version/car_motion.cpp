@@ -265,7 +265,7 @@ int main(){
     running = true;
     thread t2(car_report, car);
     vector<Coordinate> path = car->getPath();
-    path.push_back(Coordinate(5, 5));
+    path.push_back(Coordinate(140, 0));
     double newOffset = PI / 2;
     int n = path.size();
     for (int cur = 1; cur < n; ++cur)
