@@ -58,10 +58,8 @@ void speed_control(mraa_pwm_context in1, mraa_pwm_context in2, float speed) {
 double getSpeed(double dist) {
     if (dist < D_TH)
       return MIN_SPEED;
-    double speed = A*dist;
-    if(speed > 100)
-       return 100;
-    return speed;
+    double s = A * dist;
+    return s > 100 ? 100 : s;
 }
 
 double caculateMotionTime(Coordinate current, Coordinate destination, double offset, IR_device* ir){

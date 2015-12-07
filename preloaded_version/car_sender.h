@@ -111,23 +111,23 @@ public:
     else {
       for (struct addrinfo *cur = host_info_list; cur; cur = cur->ai_next) {
         struct sockaddr_in* saddr = (struct sockaddr_in*)cur->ai_addr;
-        printf("Hostname: %s\n", inet_ntoa(saddr->sin_addr));
+        //printf("Hostname: %s\n", inet_ntoa(saddr->sin_addr));
       }
     }
 
-    std::cout << "Creating a socket..."  << std::endl;
+    //std::cout << "Creating a socket..."  << std::endl;
     //host_info_list = host_info_list->ai_next;
     int socketfd;
     socketfd = socket(host_info_list->ai_family, host_info_list->ai_socktype, host_info_list->ai_protocol);
     if (socketfd == -1)
       std::cout << "Socket error";
 
-    std::cout << "Connecting..."  << std::endl;
+    //std::cout << "Connecting..."  << std::endl;
     status = connect(socketfd, host_info_list->ai_addr, host_info_list->ai_addrlen);
     if (status == -1)
       std::cout << "Connect error";
 
-    std::cout << "Sending message..."  << std::endl;
+    //std::cout << "Sending message..."  << std::endl;
     char msg[50];
     generateInfo(msg);
     int len = strlen(msg);
@@ -136,12 +136,12 @@ public:
     ssize_t bytes_sent;
     bytes_sent = send(socketfd, msg, len + 1, 0);
 
-    std::cout << "Waiting to receive data..."  << std::endl;
+    //std::cout << "Waiting to receive data..."  << std::endl;
     ssize_t bytes_received;
     char incoming_data_buf[1000];
     fill_n(incoming_data_buf, 1000, 0);
     bytes_received = recv(socketfd, incoming_data_buf, 1000, 0);
-    cout << bytes_received << " bytes received :" << endl;
+    //cout << bytes_received << " bytes received :" << endl;
     incoming_data_buf[bytes_received] = '\0';
     cout << incoming_data_buf << endl;
     if (!updated) {
@@ -149,7 +149,7 @@ public:
       updated = true;
     }
 
-    std::cout << "Receiving complete. Closing socket..." << std::endl;
+    //std::cout << "Receiving complete. Closing socket..." << std::endl;
 
     freeaddrinfo(host_info_list);
     close(socketfd);
