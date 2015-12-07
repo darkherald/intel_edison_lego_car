@@ -99,6 +99,12 @@ double caculateMotionTime(Coordinate current, Coordinate destination, double off
     }
     double round = turnangle*R;
     
+    int flag = (turn)?1:-1;
+    //caculate turning center
+    double x_c = current.x + R * sin(offset) *flag;
+    double y_c = current.y - R * cos(offset) *flag;
+    double gamma = offset + PI/2*flag;
+    
     // caculate new offset
     if(turn)
     {
@@ -131,7 +137,7 @@ double caculateMotionTime(Coordinate current, Coordinate destination, double off
 
     //go for the curve
     thread t1 = rw->threading();
-
+    
     double traveled = 0;
     while (round > traveled) {
       double left = round - traveled;
@@ -140,6 +146,12 @@ double caculateMotionTime(Coordinate current, Coordinate destination, double off
       usleep(500000);
       traveled = rw->getCount() * C_w / 360;
       cout<< "Traveled " << traveled << endl;
+      double delta_gamma = traveled / R;
+      double gamma_prime = gamma-delta_gamma*flag;
+      double x_send = x_c + R * sin(gamma_prime);
+      double y_send = y_c + R * cos(gamma_prime);
+      car->setCarPos(x_send, y_send);
+      thread t_send_round = car->threading();
     }
     cout<<"Round Finished !!!!!!"<<endl;
     speed_control(speed_pwm_in1, speed_pwm_in2, 0.0f);
@@ -152,7 +164,7 @@ double caculateMotionTime(Coordinate current, Coordinate destination, double off
     mraa_pwm_write(turn_pwm, turnCtrl);
 
     thread t2 = rw->threading();
-
+    
     traveled = 0;
     while (straight > traveled) {
       double left = straight - traveled;
@@ -161,6 +173,10 @@ double caculateMotionTime(Coordinate current, Coordinate destination, double off
       usleep(500000);
       traveled = rw->getCount() * C_w / 360;
       cout<< "Traveled " << traveled << endl;
+      double x_send = destination.x - left * cos(PI-offset);
+      double y_send = destination.y + left * sin(offset);
+        car->setCarPos(x_send, y_send);
+        threading t_send_straight = car->threading;
     }
     cout<<"Straight part finished !!!!"<<endl;
     speed_control(speed_pwm_in1, speed_pwm_in2, 0.0f);
