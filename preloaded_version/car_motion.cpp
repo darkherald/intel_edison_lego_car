@@ -58,7 +58,7 @@ void speed_control(mraa_pwm_context in1, mraa_pwm_context in2, float speed) {
 double getSpeed(double dist) {
     if (dist < D_TH)
       return MIN_SPEED;
-    int s = A * dist;
+    double s = A * dist;
     return s > 100 ? 100 : s;
 }
 
@@ -135,9 +135,11 @@ double caculateMotionTime(Coordinate current, Coordinate destination, double off
     double traveled = 0;
     while (round > traveled) {
       double left = round - traveled;
+      cout<< "Distance left " << left <<endl;
       speed_control(speed_pwm_in1, speed_pwm_in2, getSpeed(left));
       usleep(1000000);
       traveled = rw->getCount() * C_w / 360;
+      cout<< "Traveled " << traveled << endl;
     }
 
     speed_control(speed_pwm_in1, speed_pwm_in2, 0.0f);
@@ -154,9 +156,11 @@ double caculateMotionTime(Coordinate current, Coordinate destination, double off
     traveled = 0;
     while (straight > traveled) {
       double left = straight - traveled;
+      cout<< "Distance left " << left <<endl;
       speed_control(speed_pwm_in1, speed_pwm_in2, getSpeed(left));
       usleep(1000000);
       traveled = rw->getCount() * C_w / 360;
+      cout<< "Traveled " << traveled << endl;
     }
 
     speed_control(speed_pwm_in1, speed_pwm_in2, 0.0f);
