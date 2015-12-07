@@ -1,4 +1,5 @@
 #include <mutex>
+#include <iostream>
 #include <thread>
 #include <unistd.h>
 #include <mraa/gpio.h>
