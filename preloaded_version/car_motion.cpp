@@ -27,9 +27,9 @@
 #define Vr 12.40 // turning speed
 
 #define C_w 13.8 // rear wheel circumference
-#define A 1 // pid control coefficient
-#define D_TH 15 // threshold distance
-#define MIN_SPEED 15 // minimum speed
+#define A 1.5 // pid control coefficient
+#define D_TH 20 // threshold distance
+#define MIN_SPEED 30 // minimum speed
 
 #define SPEED 50
 #define PI 3.1415926535
@@ -54,7 +54,10 @@ void speed_control(mraa_pwm_context in1, mraa_pwm_context in2, float speed) {
 double getSpeed(double dist) {
     if (dist < D_TH)
       return MIN_SPEED;
-    return A * dist;
+    double speed = A*dist;
+    if(speed > 100)
+       return 100;
+    return speed;
 }
 
 double caculateMotionTime(Coordinate current, Coordinate destination, double offset, IR_device* ir){
@@ -130,9 +133,11 @@ double caculateMotionTime(Coordinate current, Coordinate destination, double off
     double traveled = 0;
     while (round > traveled) {
       double left = round - traveled;
+      cout<< "Distance left " << left <<endl;
       speed_control(speed_pwm_in1, speed_pwm_in2, getSpeed(left));
       usleep(1000000);
       traveled = rw->getCount() * C_w / 360;
+      cout<< "Traveled " << traveled << endl;
     }
 
     speed_control(speed_pwm_in1, speed_pwm_in2, 0.0f);
@@ -149,9 +154,11 @@ double caculateMotionTime(Coordinate current, Coordinate destination, double off
     traveled = 0;
     while (straight > traveled) {
       double left = straight - traveled;
+      cout<< "Distance left " << left <<endl;
       speed_control(speed_pwm_in1, speed_pwm_in2, getSpeed(left));
       usleep(1000000);
       traveled = rw->getCount() * C_w / 360;
+      cout<< "Traveled " << traveled << endl;
     }
 
     speed_control(speed_pwm_in1, speed_pwm_in2, 0.0f);
