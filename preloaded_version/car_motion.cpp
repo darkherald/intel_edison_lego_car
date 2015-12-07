@@ -204,6 +204,8 @@ double caculateMotionTime(Coordinate current, Coordinate destination, double off
     // receive message
     string msg = ir->recv();
     cout << msg << endl;
+    thread t3 = rw->threading(msg);
+    t3.join();
     return offset;
 }
 

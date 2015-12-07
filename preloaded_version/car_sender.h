@@ -95,7 +95,7 @@ public:
     carPos.y = y;
   }
 
-  void transaction() {
+  void transaction(string carMsg = "") {
     int status;
     struct addrinfo host_info;
     struct addrinfo *host_info_list;
@@ -128,9 +128,14 @@ public:
       std::cout << "Connect error";
 
     //std::cout << "Sending message..."  << std::endl;
-    char msg[50];
+    char msg[100];
     generateInfo(msg);
     int len = strlen(msg);
+    if (!carMsg.empty()) {
+      msg[len] = '#';
+      strcpy(msg + len + 1, carMsg.c_str());
+      len = strlen(msg);
+    }
     msg[len] = '\n';
     printf("%s", msg);
     ssize_t bytes_sent;
@@ -177,8 +182,8 @@ public:
     carPos.y = y;
   }
 
-  thread threading() {
-    thread t(&CarSys::transaction, this);
+  thread threading(string carMsg = "") {
+    thread t(&CarSys::transaction, this, carMsg);
     return t;
   }
 
@@ -198,7 +203,7 @@ private:
   }
 
   void generateInfo(char *msg) {
-    fill_n(msg, 50, 0);
+    fill_n(msg, 100, 0);
     strcpy(msg, idxInfo);
     int cur = strlen(msg);
     msg[cur] = '#';
