@@ -197,8 +197,8 @@ double caculateMotionTime(Coordinate current, Coordinate destination, double off
     cout<<"Sleep for 5 seconds"<<endl;
     sleep(5); 
     // receive message
-    // string msg = ir->recv();
-    //cout << msg << endl;
+    string msg = ir->recv();
+    cout << msg << endl;
     return offset;
 }
 
