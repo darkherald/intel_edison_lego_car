@@ -1,0 +1,76 @@
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8">
+        <canvas id="myCanvas" class="center-block" width="350" height="350" style="border:1px solid #d3d3d3;">
+          Your browser does not support the HTML5 canvas tag.
+        </canvas>
+        </div>
+
+        <div class="col-md-4 pull-right">
+          <p id="led1"></p>
+          <p id="led2"></p>
+          <p id="led3"></p>
+          <p id="led4"></p>
+          <p id="led5"></p>
+          <p id="car"></p>
+        </div>
+      </div>
+
+      <span class="text-center">
+        <p id="test"><%= @msg %></p>
+      </span>
+
+    </div>
+
+
+    <script type="text/javascript">
+      function drawPoint(context, x, y, type) {
+        context.beginPath();
+        context.arc(175 + x, 175 - y, 5, 0, 2*Math.PI);
+        context.fillStyle = type == 'c' ? 'red' : 'green';
+        context.fill();
+        context.stroke();
+      }
+
+      function updatePoints() {
+        $.get("update")
+          .done(function(data) {
+            var c = document.getElementById("myCanvas");
+            var ctx = c.getContext("2d");
+            c.style.width = '500px';
+            c.style.height = '500px';
+            ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+            ctx.moveTo(0, 175);
+            ctx.lineTo(350, 175);
+            ctx.stroke();
+            ctx.moveTo(175, 0);
+            ctx.lineTo(175, 350);
+            ctx.stroke();
+            var nodes = data.getElementsByTagName('hash')[0].childNodes;
+            for (var i = 1; i < nodes.length; i+=2) {
+              var t = nodes[i].tagName;
+              if (t != 'm') {
+                var x = nodes[i].childNodes[1].childNodes[0].nodeValue, y = nodes[i].childNodes[3].childNodes[0].nodeValue;
+                drawPoint(ctx, parseInt(x), parseInt(y), t);
+                var idx = t == 'c' ? '#car' : '#led' + t[1];
+                var nameTag = t == 'c' ? 'CAR:&nbsp;&nbsp;' : 'LED' + t[1] + ':';
+                $(idx).html(nameTag + ' (' + x + ', ' + y + ')');
+              } else
+                $('#test').html(nodes[i].childNodes[0].nodeValue);
+            }
+          })
+          .error(function(jqXHR, textStatus, errorThrown) {
+            $('#test').html("Failed");
+            if (textStatus == 'timeout')
+              console.log('The server is not responding');
+            if (textStatus == 'error')
+              console.log(errorThrown);
+          });
+      }
+
+      updatePoints();
+      setInterval(function() {
+        updatePoints();
+      }, 500);
+    </script> 
+

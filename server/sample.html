@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+	<body>
+
+		<canvas id="myCanvas" width="500" height="500" style="border:1px solid #d3d3d3;">
+			Your browser does not support the HTML5 canvas tag.
+		</canvas>
+
+		<script>
+			function draw_point(context, x, y, type) {
+			  context.beginPath();
+			  context.arc(x, y, 5, 0, 2*Math.PI);
+			  context.fillStyle = type == 'car' ? 'red' : 'green';
+			  context.fill();
+			  context.stroke();
+			}
+
+			var c = document.getElementById("myCanvas");
+			var ctx = c.getContext("2d");
+			draw_point(ctx, 15, 100, 'led');
+			draw_point(ctx, 50, 120, 'led');
+			draw_point(ctx, 240, 52, 'led');
+			draw_point(ctx, 400, 400, 'led');
+			draw_point(ctx, 160, 220, 'led');
+			draw_point(ctx, 30, 150, 'led');
+			draw_point(ctx, 60, 132, 'car');
+		</script> 
+
+	</body>
+</html>
